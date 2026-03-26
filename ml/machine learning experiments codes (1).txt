@@ -1,0 +1,883 @@
+
+----------------------Experiment - 1 (OLS linear Regression)-----------------------------
+import numpy as np
+def ols_linear_regression(x,y):
+    x=np.array(x)
+    y=np.array(y)
+
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
+
+    numerator = np.sum((x-x_mean)*(y-y_mean))
+    denominator = np.sum((x-x_mean)**2)
+    m=numerator/denominator
+
+    c=y_mean-m*x_mean
+    return m,c
+
+x=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+y=[2,3,5,6,5,6,8,7,9,11,9,7,8,9,12,13,15,17,18,11]
+
+m , c = ols_linear_regression(x,y)
+print("Slope (m):", m)
+print("Intercept (c):", c)
+
+def predict(x):
+    return m*x+c
+
+print("Enter the value to predict:")
+y = int(input())
+print("Prediction for", y, ":", predict(y))
+
+import matplotlib.pyplot as plt
+
+plt.scaatter(x,y,label="data points")
+x_line=np.linspace(min(x),max(x),100)
+y_line=m*x_line+c
+
+plt.plot(x_line, y_line, label="best fit line", linewidth=2)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.show()
+
+-------------------------------- Experiment - 2 ----------------------------------------
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+df = pd.read_csv('location')  #import csv file
+
+df.head(10)
+
+df.tail(10)
+
+df.columns
+
+df.shape
+
+df.info()
+
+df.describe()
+
+df['thalach'].hist()
+plt.title('Distribution of thalach')
+plt.show
+
+df.nunique()
+
+df.corr()
+
+print(df.isnull.sum())
+
+target_count = df['target'].value_counts()
+print(target_count)
+
+x=df.drop('target',axis=1)
+y=df['target']
+
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.2, random_state=42)
+
+import warnings
+warnings.filterwarnings('ignore')
+
+from sklearn.linear_model import LogisticRegression
+
+# Training the model
+log_reg_model = LogisticRegression(max_iter=1000)
+log_reg_model.fit(x_train, y_train)
+print('LogisticRegression model trained successfully')
+
+x_test.shape
+
+y_pred = log_reg_model.predict(x_test)
+print("prediction on test data is successfully completed")
+
+predictions_df = pd.DataFrame({'Actual': y_test, 'predicted': y_pred})
+predictions_df['Correct'] = (predictions_df['Actual'] == predictions_df['predicted'])
+display(predictions_df.head())
+
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+
+conf_matrix = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+print("==performance of logistic regression model==")
+print(f"accuracy={accuracy*100:.2f}%")
+print(f"precision={precision*100:.2f}%")
+print(f"recall={recall*100:.2f}%")
+print(f"f1_score={f1*100:.2f}%")
+print("\nConfusion Matrix:")
+print(conf_matrix)
+
+-------------------------------- Experiment - 3 ----------------------------------------
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+
+df = pd.read_csv("/content/Iris.csv")
+print("File Loaded Successfully!")
+print(df.head())
+print("Shape:", df.shape)
+
+# If last column contains species labels
+feature_columns = df.columns[:-1]
+label_column = df.columns[-1]
+
+X = df[feature_columns].values
+y = df[label_column].values
+
+print("\nFeatures:", feature_columns.tolist())
+print("Target Column:", label_column)
+print("Unique Classes:", np.unique(y))
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+print(X_scaled.shape)
+print(X_scaled[:5])
+
+pca2 = PCA(n_components=3)
+X_pca2 = pca2.fit_transform(X_scaled)
+
+print("\nExplained Variance Ratio (2 Components):")
+print(pca2.explained_variance_ratio_)
+
+print("Total variance explained:", pca2.explained_variance_ratio_.sum())
+
+print(X_pca2[:10])  # first 10 rows
+
+#2D scatter plot
+
+plt.figure(figsize=(8,6))
+for species in np.unique(y):
+    plt.scatter(
+        X_pca2[y == species, 0],
+        X_pca2[y == species, 1],
+        label=species,
+        s=60
+    )
+
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("PCA on Iris Dataset (2D)")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+#3D Scatter Plot
+from mpl_toolkits.mplot3d import Axes3D  # Import for 3D plotting
+
+# Create a 3D figure
+fig = plt.figure(figsize=(12, 12))
+ax = fig.add_subplot(111, projection='3d')  # Create 3D axes
+
+for species in np.unique(y):
+    ax.scatter(
+        X_pca2[y == species, 0],  # x-coordinate (PC1)
+        X_pca2[y == species, 1],  # y-coordinate (PC2)
+        X_pca2[y == species, 2],  # z-coordinate (PC3)
+        label=species,
+        s=60
+    )
+
+ax.set_xlabel("Principal Component 1")
+ax.set_ylabel("Principal Component 2")
+ax.set_zlabel("Principal Component 3")
+ax.set_title("PCA on Iris Dataset (3D)")
+plt.legend()
+plt.tight_layout()
+plt.show() 
+
+-------------------------------- Experiment - 4 ----------------------------------------
+
+import pandas as pd
+df = pd.read_csv('/content/Iris.csv')
+
+df.head()
+
+df.tail()
+
+df.shape()
+
+df.info()
+
+df.describe()
+
+df.nunique()
+
+df.isnull().sum()
+
+species_count = df['Species'].value_counts()
+print(species_count)
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.figure(figsize=(6, 4))
+sns.countplot(x='Species', hue='Species', data=df, palette='viridis')
+plt.title('Distribution of Species')
+plt.xlabel('Species of Iris dataset')
+plt.ylabel('Count')
+plt.show()
+
+from sklearn.model_selection import train_test_split
+x = df.drop('Species', axis=1)
+y = df['Species']
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.4,random_state=42)
+
+from sklearn.tree import DecisionTreeClassifier
+dt = DecisionTreeClassifier()
+dt.fit(x_train, y_train)
+print("Decision Tree classifier has been trained successfully")
+
+y_pred = dt.predict(x_test)
+print("Predictions on test set has been generated successfully")
+
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+# Confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:\n", conf_matrix)
+
+import seaborn as sns
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, cmap='Blues', xticklabels=dt.classes_,yticklabels=dt.classes_)
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.show()
+
+-------------------------------- Experiment - 5 ----------------------------------------
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score,confusion_matrix
+
+df=pd.read_csv('/content/heart-1.csv')
+
+df.head(10)
+
+df.tail()
+
+df.columns()
+
+df.shape()
+
+df.info()
+
+df.describe()
+
+df['thalach'].hist()
+
+df.nunique()
+
+df.corr()
+
+df.isnull().sum()
+
+target_count = df['target'].value_counts()
+target_count
+
+from sklearn.model_selection import train_test_split
+
+x=df.drop('target',axis=1)
+y=df['target']
+
+x_train, x_test, y_train, y_tst = train_test_split(x, y, test_size=0.2, random_state=42)
+
+x_train
+
+import warnings
+warnings.filterwarnings('ignore')
+
+from sklearn.linear_model import LogisticRegression
+log_reg_model=LogisticRegression()
+log_reg_model.fit(x_train,y_train)
+print('LogisticRegression successfully completed')
+
+x_test.shape
+
+y_pred = log_reg_model.predict(x_test)
+print('prediction on test data is successfully compeleted')
+
+predictions_df = pd.DataFrame({'Actual':y_test,"predicted":y_pred})
+predictions_df['Correct']=(predictions_df['Actual']==predictions_df['predicted'])
+display(predictions_df.head())
+
+from sklearn.metrics import(
+    confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+)
+conf_matrix = confusion_matrix(y_test, y_pred)
+print(conf_matrix)
+
+accuracy=accuracy_score(y_test,y_pred)
+precision=precision_score(y_test,y_pred)
+recall=recall_score(y_test,y_pred)
+f1_score=f1_score(y_test,y_pred)
+
+print("\n==performance of logistic regression model==")
+print(f"accuracy={accuracy*100:.2f}")
+print(f"precision={precision*100:.2f}")
+print(f"recall={recall*100:.2f}")
+print(f"f1_score={f1_score*100:.2f}")
+
+-------------------------------- Experiment - 6 ----------------------------------------
+# Import necessary libraries
+
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, roc_auc_score, roc_curve
+import matplotlib.pyplot as plt
+import seaborn as sns
+# To remove warning messages from the output
+import warnings
+warnings.simplefilter(action = 'ignore')
+
+# Loading the dataset
+df = pd.read_csv('/content/heart-1.csv')
+
+df.head()
+
+df.tail()
+
+df.shape()
+
+df.info()
+
+df.describe()
+
+df.hist(figsize=(15,10));
+
+df.nunique()
+
+# Displaying missing values count, if any.
+df.isnull().sum()
+
+# Displaying the output variable lables count
+target_count = df['target'].value_counts()
+print(target_count)
+
+X = df.drop('target', axis=1)
+y = df['target']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+#Random state ensures that the same train–test split is produced every time you run the code.
+
+# Creating an instance of the Logistic Regression model from the scikit-learn library.
+log_reg_model = LogisticRegression()
+
+# Training the model using training data
+log_reg_model.fit(X_train, y_train)
+print("Logistic Regression model has been trained successfully")
+
+# Predicting the labels on testing data
+y_pred = log_reg_model.predict(X_test)
+print("Predictions on test data generated successfully")
+
+# Evaluating the performance of the logistic regression model
+
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True,  cmap='Blues', xticklabels=['0', '1'], yticklabels=['0', '1'])
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.show()
+
+# Get predicted probabilities for the positive class
+y_pred_proba = log_reg_model.predict_proba(X_test)[:, 1]
+
+# Calculate ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+# FPR is the proportion of actual negative cases were incorrectly classified as positive.
+# TPR is the proportion of actual positive cases were correctly identified as positive.
+
+# Calculate AUC score
+auc_score = roc_auc_score(y_test, y_pred_proba)
+
+# Plot the ROC curve
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='blue', label=f'ROC curve (AUC = {auc_score:.2f})')
+plt.plot([0, 1], [0, 1], color='red', linestyle='--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Performance on Training set
+y_pred_train = log_reg_model.predict(X_train)
+conf_matrix = confusion_matrix(y_train, y_pred_train)
+print("\nConfusion Matrix:\n", confusion_matrix(y_train, y_pred_train))
+print("\nAccuracy:", accuracy_score(y_train, y_pred_train))
+print("\nClassification Report:\n", classification_report(y_train, y_pred_train))
+
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+
+# Creating an instance of the Naive Bayes model from the scikit-learn library.
+nb = GaussianNB()
+# Training the model using training data
+nb.fit(X_train, y_train)
+print("Naive Bayes model has been trained successfully")
+
+# Predicting the labels on testing data
+y_pred_nb = nb.predict(X_test)
+print("Predictions on test data generated successfully")
+
+# Evaluating the performance of the logistic regression modelprint("\nAccuracy:", accuracy_score(y_test, y_pred_nb))
+print("\nAccuracy:", accuracy_score(y_test, y_pred_nb))
+print("=== Naive Bayes Classification Report ===")
+print(classification_report(y_test, y_pred_nb))
+
+
+# Get predicted probabilities for the positive class
+y_pred_proba_nb = nb.predict_proba(X_test)[:, 1]
+
+# Calculate ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba_nb)
+
+# Calculate AUC score
+auc_score = roc_auc_score(y_test, y_pred_proba_nb)
+
+# Plot the ROC curve
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='blue', label=f'ROC curve (AUC = {auc_score:.2f})')
+plt.plot([0, 1], [0, 1], color='red', linestyle='--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+from sklearn.neighbors import KNeighborsClassifier
+
+# Creating an instance of the KNN model from the scikit-learn library.
+knn = KNeighborsClassifier(n_neighbors=5)
+
+# Training the model using training data
+# Ensure you have run cell wVp9gRqc987G to define X_train_scaled
+knn.fit(X_train_scaled, y_train)
+print("KNN model has been trained successfully")
+
+# Predicting the labels on testing data
+y_pred_knn = knn.predict(X_test_scaled)
+print("Predictions on test data generated successfully")
+
+# Evaluating the performance of the logistic regression model
+print("\nAccuracy:", accuracy_score(y_test, y_pred_knn))
+print("=== KNN Classification Report ===")
+print(classification_report(y_test, y_pred_knn))
+
+# Get probability scores for the positive class
+y_prob_knn = knn.predict_proba(X_test_scaled)[:, 1]
+
+# Calculate False Positive Rate and True Positive Rate
+fpr, tpr, thresholds = roc_curve(y_test, y_prob_knn)
+
+# Calculate ROC-AUC score
+auc_knn = roc_auc_score(y_test, y_prob_knn)
+
+print("KNN ROC-AUC Score:", auc_knn)
+
+# Plot ROC Curve
+plt.figure(figsize=(6,5))
+plt.plot(fpr, tpr, label=f"KNN (AUC = {auc_knn:.2f})")
+plt.plot([0,1], [0,1], linestyle='--', color='gray')  # Random classifier
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC–AUC Curve for KNN Classifier")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Creating an instance of the KNN model from the scikit-learn library.
+dt = DecisionTreeClassifier(random_state=42)
+# Training the model using training data
+dt.fit(X_train, y_train)
+print("Decision Tree model has been trained successfully")
+
+# Predicting the labels on testing data
+y_pred_dt = dt.predict(X_test)
+print("Predictions on test data generated successfully")
+
+# Evaluating the performance of the logistic regression model
+print("\nAccuracy:", accuracy_score(y_test, y_pred_dt))
+print("=== Decision Tree Classification Report ===")
+print(classification_report(y_test, y_pred_dt))
+
+# Get probability scores for the positive class
+y_prob_dt = dt.predict_proba(X_test)[:, 1]
+
+# Calculate False Positive Rate and True Positive Rate
+fpr, tpr, thresholds = roc_curve(y_test, y_prob_dt)
+
+# Calculate ROC-AUC score
+auc_dt = roc_auc_score(y_test, y_prob_dt)
+
+print("Decision Tree ROC-AUC Score:", auc_dt)
+
+# Plot ROC Curve
+plt.figure(figsize=(6,5))
+plt.plot(fpr, tpr, label=f"Decision Tree (AUC = {auc_dt:.2f})")
+plt.plot([0,1], [0,1], linestyle='--', color='gray')  # Random classifier line
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC–AUC Curve for Decision Tree Classifier")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+
+# Creating an instance of the SVM model from the scikit-learn library.
+svm = SVC(kernel='rbf', probability=True, random_state=42)
+# Training the model using training data
+svm.fit(X_train_scaled, y_train)
+print("SVM model has been trained successfully")
+
+# Predicting the labels on testing data
+y_pred_svm = svm.predict(X_test_scaled)
+print("Predictions on test data generated successfully")
+
+# Evaluating the performance of the logistic regression model
+print("\nAccuracy:", accuracy_score(y_test, y_pred_svm))
+print("=== SVM Classification Report ===")
+print(classification_report(y_test, y_pred_svm))
+
+# Get probability scores for the positive class
+y_prob_svm = svm.predict_proba(X_test_scaled)[:, 1]
+
+# Calculate False Positive Rate and True Positive Rate
+fpr, tpr, thresholds = roc_curve(y_test, y_prob_svm)
+
+# Calculate ROC-AUC score
+auc_svm = roc_auc_score(y_test, y_prob_svm)
+
+print("SVM ROC-AUC Score:", auc_svm)
+
+# Plot ROC Curve
+plt.figure(figsize=(6,5))
+plt.plot(fpr, tpr, label=f"SVM (AUC = {auc_svm:.2f})")
+plt.plot([0,1], [0,1], linestyle='--', color='gray')  # Random classifier
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC–AUC Curve for SVM Classifier")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(8,6))
+
+# -------- Naive Bayes --------
+y_prob_nb = nb.predict_proba(X_test)[:,1]
+fpr_nb, tpr_nb, _ = roc_curve(y_test, y_prob_nb)
+auc_nb = roc_auc_score(y_test, y_prob_nb)
+plt.plot(fpr_nb, tpr_nb, label=f"Naive Bayes (AUC = {auc_nb:.2f})")
+
+# -------- KNN --------
+y_prob_knn = knn.predict_proba(X_test_scaled)[:,1]
+fpr_knn, tpr_knn, _ = roc_curve(y_test, y_prob_knn)
+auc_knn = roc_auc_score(y_test, y_prob_knn)
+plt.plot(fpr_knn, tpr_knn, label=f"KNN (AUC = {auc_knn:.2f})")
+
+# -------- Decision Tree --------
+y_prob_dt = dt.predict_proba(X_test)[:,1]
+fpr_dt, tpr_dt, _ = roc_curve(y_test, y_prob_dt)
+auc_dt = roc_auc_score(y_test, y_prob_dt)
+plt.plot(fpr_dt, tpr_dt, label=f"Decision Tree (AUC = {auc_dt:.2f})")
+
+# -------- SVM --------
+y_prob_svm = svm.predict_proba(X_test_scaled)[:,1]
+fpr_svm, tpr_svm, _ = roc_curve(y_test, y_prob_svm)
+auc_svm = roc_auc_score(y_test, y_prob_svm)
+plt.plot(fpr_svm, tpr_svm, label=f"SVM (AUC = {auc_svm:.2f})")
+
+# Random classifier line
+plt.plot([0,1], [0,1], '--', color='gray')
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC–AUC Curves for Multiple Classifiers")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+------------------------------Experiment 7 (K means clustering ) -------------------
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Load dataset
+df = pd.read_csv("Iris.csv")
+
+# X contains input features
+X = df.drop("Species", axis=1)
+
+# Feature scaling (important for K-means)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply K-means
+kmeans = KMeans(n_clusters=3, random_state=42)
+kmeans.fit(X_scaled)
+
+# Cluster labels
+labels = kmeans.labels_
+print("Cluster Labels:", labels)
+
+# Cluster centers
+centroids = kmeans.cluster_centers_
+print("Cluster Centers:\n", centroids)
+
+# Plot using first two features (for visualization)
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=labels)
+plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=200)
+plt.xlabel("Sepal Length (scaled)")
+plt.ylabel("Sepal Width (scaled)")
+plt.title("K-Means Clustering on Iris Dataset")
+plt.show()
+
+
+plt.scatter(X_scaled[:, 2], X_scaled[:, 3], c=labels)
+plt.scatter(centroids[:, 2], centroids[:, 3], marker='x', s=200)
+
+plt.xlabel("Petal Length (scaled)")
+plt.ylabel("Petal Width (scaled)")
+plt.title("K-Means Clustering (Petal Features)")
+plt.grid(True)
+plt.show()
+
+
+from sklearn.metrics import silhouette_score
+
+print("Inertia (WCSS):", kmeans.inertia_)
+print("Silhouette Score:", silhouette_score(X_scaled, labels))
+
+------------------------------------Experiment 8-------------------------------------------
+
+
+
+
+
+-------------------------------------Experiment9------------------------------------------
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.metrics import accuracy_score, classification_report
+
+y_pred = model.predict(X_test)
+
+# Evaluation
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Classification Report:\n", classification_report(y_test, y_pred))
+digits = datasets.load_digits()
+X = digits.data
+y = digits.target
+plt.imshow(digits.images[0], cmap='gray')
+plt.title("Digit: " + str(digits.target[0]))
+plt.show()
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#Support Vector  machine model
+model_svc = svm.SVC(probability=True)
+model_svc.fit(x_train, y_train)
+print("support vector machine model trained successfully")
+y_pred_svm = model_svc.predict(x_test)
+print("predictions on test data generated successfully")
+conf_matrix = confusion_matrix(y_test, y_pred_svm)
+print("confusion matrix:\n", conf_matrix)
+print("\nAccuracy:", accuracy_score(y_test, y_pred_svm))
+print("==support vector machine report==")
+print(classification_report(y_test, y_pred_svm))
+
+#Decision Tree model
+model_dt = dt()
+model_dt.fit(x_train, y_train)
+print("Decision Tree model trained successfully")
+y_pred_dt = model_dt.predict(x_test)
+print("predictions on test data generated successfully")
+conf_matrix = confusion_matrix(y_test, y_pred_dt)
+print("confusion matrix:\n", conf_matrix)
+print("\nAccuracy:", accuracy_score(y_test, y_pred_dt))
+print("==Decision Tree Classifier report==")
+print(classification_report(y_test, y_pred_dt))
+
+
+
+# rainforest model
+model_rf = rf()
+model_rf.fit(x_train, y_train)
+print("Random Forest model trained successfully")
+y_pred_rf = model_rf.predict(x_test)
+print("predictions on test data generated successfully")
+conf_matrix = confusion_matrix(y_test, y_pred_rf)
+print("confusion matrix:\n", conf_matrix)
+print("\nAccuracy:", accuracy_score(y_test, y_pred_rf))
+print("==Random Forest Classifier report==")
+print(classification_report(y_test, y_pred_rf))
+
+
+
+-----------------------------------------------------
+
+------------------------------Experiment 10--------------------------------
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier, RandomForestClassifier
+
+from sklearn.metrics import classification_report, accuracy_score,confusion_matrix, roc_curve, roc_auc_score
+
+# Load dataset
+data = pd.read_csv("/content/heart-1.csv")
+
+# X contains input features
+X = data.drop("target", axis=1)
+
+# y contains output class
+y = data["target"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create Bagging model
+bagging = BaggingClassifier(
+    estimator=DecisionTreeClassifier(),  # Base estimator
+    n_estimators=50,                     # Number of trees
+    random_state=42
+)
+
+# Train the Bagging model
+bagging.fit(X_train, y_train)
+
+# Predict on test data
+y_pred_bag = bagging.predict(X_test)
+
+# Display results
+
+print("\n Confusion Matrix: \n", confusion_matrix(y_test, y_pred_bag))
+print("\n Accuracy:", accuracy_score(y_test, y_pred_bag)*100)
+print("\n Bagging Classification Report: \n", classification_report(y_test, y_pred_bag))
+
+# Create AdaBoost model with shallow decision tree
+adaboost = AdaBoostClassifier(
+    estimator=DecisionTreeClassifier(max_depth=1),
+    n_estimators=100,                   # Number of weak learners
+    learning_rate=0.5,                  # Contribution of each learner
+    random_state=42
+)
+
+
+# Train AdaBoost model
+adaboost.fit(X_train, y_train)
+
+# Predict on test data
+y_pred_ada = adaboost.predict(X_test)
+
+# Display results
+print("\n Confusion Matrix: \n", confusion_matrix(y_test, y_pred_ada))
+print("\n Accuracy:", accuracy_score(y_test, y_pred_ada)*100)
+print("\n Bagging Classification Report: \n", classification_report(y_test, y_pred_ada))
+
+# Create Random Forest model
+rf = RandomForestClassifier(
+    n_estimators=200,                  # Number of trees
+    max_depth=10,                       # Maximum depth of each tree
+    min_samples_split=5,               # Minimum samples to split a node
+    random_state=42
+)
+
+# Train Random Forest model
+rf.fit(X_train, y_train)
+
+# Predict on test data
+y_pred_rf = rf.predict(X_test)
+
+# Display results
+print("\n Confusion Matrix: \n", confusion_matrix(y_test, y_pred_rf))
+print("\n Accuracy:", accuracy_score(y_test, y_pred_rf)*100)
+print("\n Bagging Classification Report: \n", classification_report(y_test, y_pred_rf))
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.metrics import roc_curve, roc_auc_score
+
+plt.figure(figsize=(7,6))
+
+# Bagging
+y_prob_bag = bagging.predict_proba(X_test)[:,1]
+fpr_bag, tpr_bag, _ = roc_curve(y_test, y_prob_bag)
+auc_bag = roc_auc_score(y_test, y_prob_bag)
+plt.plot(fpr_bag, tpr_bag, label=f"Bagging (AUC={auc_bag:.2f})")
+
+# AdaBoost
+y_prob_ada = adaboost.predict_proba(X_test)[:,1]
+fpr_ada, tpr_ada, _ = roc_curve(y_test, y_prob_ada)
+auc_ada = roc_auc_score(y_test, y_prob_ada)
+plt.plot(fpr_ada, tpr_ada, label=f"AdaBoost (AUC={auc_ada:.2f})")
+
+# Random Forest
+y_prob_rf = rf.predict_proba(X_test)[:,1]
+fpr_rf, tpr_rf, _ = roc_curve(y_test, y_prob_rf)
+auc_rf = roc_auc_score(y_test, y_prob_rf)
+plt.plot(fpr_rf, tpr_rf, label=f"Random Forest (AUC={auc_rf:.2f})")
+
+# Random classifier
+plt.plot([0,1],[0,1],'--',color='gray')
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC–AUC Comparison of Ensemble Models")
+plt.legend()
+plt.grid(True)
+plt.show()
+
